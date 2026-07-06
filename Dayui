@@ -743,7 +743,6 @@ local function CreatePickerWindow(T, pickerName, initialColor, screenGui, onColo
 				dcon = UserInputService.InputChanged:Connect(function(io2)
 					if io2.UserInputType == Enum.UserInputType.MouseMovement then
 						local rv = math.clamp((io2.Position.X - containerPos.X) / containerWidth, 0, 1)
-						targetPos = UDim2.fromScale(rv, 0)
 						val = rv
 						displayHSV(false)
 					end
@@ -944,31 +943,31 @@ function SimpleKavo.CreateLib(title, themeName)
 	local listeningForKey = false
 
 	local ScreenGui = Instance.new("ScreenGui")
-  ScreenGui.Name = "Meow" .. tostring(math.random(10000, 99999))
-  ScreenGui.ResetOnSpawn = false
-  ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-  ScreenGui.DisplayOrder = 2147483647
+	ScreenGui.Name = "Meow" .. tostring(math.random(10000, 99999))
+	ScreenGui.ResetOnSpawn = false
+	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+	ScreenGui.DisplayOrder = 2147483647
 	local ok, err = pcall(function()
-	local parent = (gethui and gethui())
-		or (syn and syn.protect_gui and game:GetService("CoreGui"))
-		or game:GetService("CoreGui")
+		local parent = (gethui and gethui())
+			or (syn and syn.protect_gui and game:GetService("CoreGui"))
+			or game:GetService("CoreGui")
 
-	ScreenGui.Parent = parent
+		ScreenGui.Parent = parent
 
-	if syn and syn.protect_gui then
-		syn.protect_gui(ScreenGui)
-	end
-end)
-
-if not ok then
-	local ok2 = pcall(function()
-		ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui
+		if syn and syn.protect_gui then
+			syn.protect_gui(ScreenGui)
+		end
 	end)
-	if not ok2 then
-		warn("Failed to parent ScreenGui: " .. tostring(err))
-		return
+
+	if not ok then
+		local ok2 = pcall(function()
+			ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui
+		end)
+		if not ok2 then
+			warn("Failed to parent ScreenGui: " .. tostring(err))
+			return
+		end
 	end
-end
 
 	local Main = Instance.new("Frame")
 	Main.Name = "Main"
@@ -3233,14 +3232,14 @@ end
 				TextBox.Font = Enum.Font.SourceSans
 				TextBox.PlaceholderText = placeholder or "..."
 				TextBox.PlaceholderColor3 = T.TextDim
-				TextBox.Text = tbName
+				TextBox.Text = ""
 				TextBox.TextColor3 = T.TextPrimary
 				TextBox.TextSize = 14
 				TextBox.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 				TextBox.TextStrokeTransparency = 0.8
 				TextBox.TextXAlignment = Enum.TextXAlignment.Left
 				TextBox.TextTruncate = Enum.TextTruncate.AtEnd
-				TextBox.ClearTextOnFocus = true
+				TextBox.ClearTextOnFocus = false
 				TextBox.ZIndex = 35
 
 				local TBCorner = Instance.new("UICorner")
@@ -3265,10 +3264,9 @@ end
 				TextBox.FocusLost:Connect(function(enterPressed)
 					Tween(TextBox, { BackgroundColor3 = T.Window1, TextColor3 = T.TextPrimary }, 0.2, 2)
 					Tween(TBStroke, { Color = T.Stroke }, 0.2, 2)
-					if enterPressed then
-						TextBox.Text = tbName
+					if enterPressed and callback then
+						callback(TextBox.Text)
 					end
-					if enterPressed and callback then callback(TextBox.Text) end
 				end)
 
 				local methods = {}
