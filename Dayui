@@ -1276,6 +1276,45 @@ function SimpleKavo.CreateLib(title, themeName)
 
 	local Minimized = false
 
+	local MobileToggle
+	if UserInputService.TouchEnabled then
+		MobileToggle = Instance.new("ImageButton")
+		MobileToggle.Name = "MobileToggle"
+		MobileToggle.Parent = ScreenGui
+		MobileToggle.BackgroundColor3 = T.Button1
+		MobileToggle.BorderSizePixel = 0
+		MobileToggle.AnchorPoint = Vector2.new(0, 1)
+		MobileToggle.Position = UDim2.new(0, 20, 1, -20)
+		MobileToggle.Size = UDim2.fromOffset(50, 50)
+		MobileToggle.Image = "rbxassetid://124090121529164"
+		MobileToggle.ImageColor3 = T.Primary
+		MobileToggle.ScaleType = Enum.ScaleType.Fit
+		MobileToggle.AutoButtonColor = false
+		MobileToggle.ZIndex = 1000
+
+		local MobileToggleCorner = Instance.new("UICorner")
+		MobileToggleCorner.CornerRadius = UDim.new(0, 8)
+		MobileToggleCorner.Parent = MobileToggle
+
+		local MobileToggleStroke = Instance.new("UIStroke")
+		MobileToggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		MobileToggleStroke.Color = T.Stroke
+		MobileToggleStroke.LineJoinMode = Enum.LineJoinMode.Round
+		MobileToggleStroke.Thickness = 1
+		MobileToggleStroke.Parent = MobileToggle
+
+		MobileToggle.MouseButton1Click:Connect(function()
+			Minimized = not Minimized
+			Main.Visible = not Minimized
+			Tween(MobileToggleStroke, { Color = T.StrokeHover }, 0.15, 2)
+			task.delay(0.15, function()
+				Tween(MobileToggleStroke, { Color = T.Stroke }, 0.15, 2)
+			end)
+		end)
+
+		SimpleKavo:DraggingEnabled(MobileToggle)
+	end
+
 	UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		if listeningForKey then
 			if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
