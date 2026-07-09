@@ -2530,6 +2530,7 @@ function SimpleKavo.CreateLib(title, themeName)
 					local hasSlider = (t == "slider" or t == "sliderf" or t == "toggleslider" or t == "togglesliderf")
 					local isKeybind = (t == "keybind")
 					local isColorPicker = (t == "colorpicker")
+					local isButton = (t == "button")
 					local initKey = nil
 					if isKeybind then
 						local defRaw = opt.default
@@ -2540,6 +2541,7 @@ function SimpleKavo.CreateLib(title, themeName)
 						sliderValue = hasSlider and (opt.default or opt.min or 0) or nil,
 						keybindValue = isKeybind and initKey or nil,
 						colorValue = isColorPicker and (opt.defaultColor or Color3.fromRGB(255, 255, 255)) or nil,
+						isButton = isButton or false,
 					}
 				end
 
@@ -2639,6 +2641,7 @@ function SimpleKavo.CreateLib(title, themeName)
 				local SLIDER_EXTRA_H = 26
 				local KEYBIND_ROW_H  = 28
 				local COLOR_ROW_H    = 24
+				local BUTTON_ROW_H   = 24
 
 				local rows = {}
 				local totalOptionsHeight = 0
@@ -2652,6 +2655,7 @@ function SimpleKavo.CreateLib(title, themeName)
 					local hasSlider = (t == "slider" or t == "sliderf" or t == "toggleslider" or t == "togglesliderf")
 					local isKeybind = (t == "keybind")
 					local isColorPicker = (t == "colorpicker")
+					local isButton = (t == "button")
 					local isFloat   = (t == "sliderf" or t == "togglesliderf")
 					local decimals  = math.clamp(math.floor(opt.decimals or 0), 0, 10)
 					local fmt       = "%." .. tostring(decimals) .. "f"
@@ -2661,6 +2665,8 @@ function SimpleKavo.CreateLib(title, themeName)
 						rowH = COLOR_ROW_H
 					elseif isKeybind then
 						rowH = KEYBIND_ROW_H
+					elseif isButton then
+						rowH = BUTTON_ROW_H
 					elseif hasToggle and hasSlider then
 						rowH = TOGGLE_ROW_H + SLIDER_EXTRA_H
 					elseif hasSlider then
@@ -2689,7 +2695,81 @@ function SimpleKavo.CreateLib(title, themeName)
 						Sep.Parent = Row
 					end
 
-					if isColorPicker then
+					if isButton then
+						local BtnLabel = Instance.new("TextLabel")
+						BtnLabel.BackgroundTransparency = 1
+						BtnLabel.Font = Enum.Font.SourceSans
+						BtnLabel.Name = "Label"
+						BtnLabel.Position = UDim2.fromOffset(8, 0)
+						BtnLabel.Size = UDim2.new(1, -50, 1, 0)
+						BtnLabel.Text = opt.name
+						BtnLabel.TextColor3 = T.TextPrimary
+						BtnLabel.TextSize = 14
+						BtnLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+						BtnLabel.TextStrokeTransparency = 0.8
+						BtnLabel.TextXAlignment = Enum.TextXAlignment.Left
+						BtnLabel.ZIndex = 38
+						BtnLabel.Parent = Row
+
+						local BtnClick = Instance.new("TextButton")
+						BtnClick.AnchorPoint = Vector2.new(1, 0.5)
+						BtnClick.BackgroundColor3 = T.Button1
+						BtnClick.Name = "Button"
+						BtnClick.Position = UDim2.new(1, -6, 0.5, 0)
+						BtnClick.Size = UDim2.fromOffset(20, 20)
+						BtnClick.Text = ""
+						BtnClick.AutoButtonColor = false
+						BtnClick.ZIndex = 38
+						BtnClick.Parent = Row
+
+						local BtnCorner = Instance.new("UICorner")
+						BtnCorner.CornerRadius = UDim.new(0, 2)
+						BtnCorner.Parent = BtnClick
+
+						local BtnStroke = Instance.new("UIStroke")
+						BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+						BtnStroke.Color = T.Stroke
+						BtnStroke.LineJoinMode = Enum.LineJoinMode.Round
+						BtnStroke.Thickness = 1
+						BtnStroke.Parent = BtnClick
+
+						local BtnIcon = Instance.new("ImageLabel")
+						BtnIcon.BackgroundTransparency = 1
+						BtnIcon.BorderSizePixel = 0
+						BtnIcon.Image = "rbxassetid://9801455339"
+						BtnIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+						BtnIcon.Name = "Icon"
+						BtnIcon.Rotation = 360
+						BtnIcon.Size = UDim2.fromScale(1, 1)
+						BtnIcon.ZIndex = 38
+						BtnIcon.Parent = BtnClick
+
+						local BtnIconGrad = Instance.new("UIGradient")
+						BtnIconGrad.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(200, 200, 200))
+						BtnIconGrad.Rotation = 90
+						BtnIconGrad.Parent = BtnIcon
+
+						BtnClick.MouseEnter:Connect(function()
+							Tween(BtnClick, { BackgroundColor3 = T.Button2 }, 0.2, 2)
+							Tween(BtnStroke, { Color = T.StrokeHover }, 0.2, 2)
+						end)
+						BtnClick.MouseLeave:Connect(function()
+							Tween(BtnClick, { BackgroundColor3 = T.Button1 }, 0.2, 2)
+							Tween(BtnStroke, { Color = T.Stroke }, 0.2, 2)
+						end)
+						BtnClick.MouseButton1Click:Connect(function()
+							BtnIcon.ImageColor3 = T.Primary
+							Tween(BtnIcon, { ImageColor3 = Color3.fromRGB(255, 255, 255) }, 1, 2)
+							if callback then
+								callback(opt.name, nil, nil, allStates)
+							end
+						end)
+
+						rows[opt.name] = rows[opt.name] or {}
+						rows[opt.name].btnClick = BtnClick
+						rows[opt.name].row = Row
+
+					elseif isColorPicker then
 						local initColor = allStates[opt.name].colorValue
 						local cpWindowObj = nil
 						colorPickerOpening[opt.name] = false
