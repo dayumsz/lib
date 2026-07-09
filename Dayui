@@ -2696,44 +2696,61 @@ function SimpleKavo.CreateLib(title, themeName)
 					end
 
 					if isButton then
+						local ControlFrame = Instance.new("Frame")
+						ControlFrame.BackgroundTransparency = 1
+						ControlFrame.Name = opt.name .. "_Control"
+						ControlFrame.Size = UDim2.new(1, 0, 0, 20)
+						ControlFrame.ZIndex = 38
+						ControlFrame.Parent = Row
+
+						local ClickSensor = Instance.new("TextButton")
+						ClickSensor.BackgroundTransparency = 1
+						ClickSensor.Name = "ClickSensor"
+						ClickSensor.Size = UDim2.fromScale(1, 1)
+						ClickSensor.Text = ""
+						ClickSensor.ZIndex = 38
+						ClickSensor.Parent = ControlFrame
+
 						local BtnLabel = Instance.new("TextLabel")
 						BtnLabel.BackgroundTransparency = 1
 						BtnLabel.Font = Enum.Font.SourceSans
 						BtnLabel.Name = "Label"
-						BtnLabel.Position = UDim2.fromOffset(8, 0)
-						BtnLabel.Size = UDim2.new(1, -50, 1, 0)
+						BtnLabel.Size = UDim2.fromScale(1, 1)
 						BtnLabel.Text = opt.name
 						BtnLabel.TextColor3 = T.TextPrimary
 						BtnLabel.TextSize = 14
 						BtnLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 						BtnLabel.TextStrokeTransparency = 0.8
 						BtnLabel.TextXAlignment = Enum.TextXAlignment.Left
-						BtnLabel.ZIndex = 38
-						BtnLabel.Parent = Row
+						BtnLabel.ZIndex = 39
+						BtnLabel.Parent = ClickSensor
 
-						local BtnClick = Instance.new("TextButton")
-						BtnClick.AnchorPoint = Vector2.new(1, 0.5)
-						BtnClick.BackgroundColor3 = T.Button1
-						BtnClick.Name = "Button"
-						BtnClick.Position = UDim2.new(1, -6, 0.5, 0)
-						BtnClick.Size = UDim2.fromOffset(20, 20)
-						BtnClick.Text = ""
-						BtnClick.AutoButtonColor = false
-						BtnClick.ZIndex = 38
-						BtnClick.Parent = Row
+						local BtnLabelPad = Instance.new("UIPadding")
+						BtnLabelPad.PaddingLeft = UDim.new(0, 6)
+						BtnLabelPad.Parent = BtnLabel
+
+						local BtnFrame = Instance.new("Frame")
+						BtnFrame.AnchorPoint = Vector2.new(1, 0.5)
+						BtnFrame.BackgroundColor3 = T.Button1
+						BtnFrame.Name = "Button"
+						BtnFrame.Position = UDim2.new(1, -3, 0.5, 0)
+						BtnFrame.Size = UDim2.fromOffset(16, 16)
+						BtnFrame.ZIndex = 39
+						BtnFrame.Parent = ClickSensor
 
 						local BtnCorner = Instance.new("UICorner")
 						BtnCorner.CornerRadius = UDim.new(0, 2)
-						BtnCorner.Parent = BtnClick
+						BtnCorner.Parent = BtnFrame
 
 						local BtnStroke = Instance.new("UIStroke")
 						BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 						BtnStroke.Color = T.Stroke
 						BtnStroke.LineJoinMode = Enum.LineJoinMode.Round
 						BtnStroke.Thickness = 1
-						BtnStroke.Parent = BtnClick
+						BtnStroke.Parent = BtnFrame
 
 						local BtnIcon = Instance.new("ImageLabel")
+						BtnIcon.Active = false
 						BtnIcon.BackgroundTransparency = 1
 						BtnIcon.BorderSizePixel = 0
 						BtnIcon.Image = "rbxassetid://9801455339"
@@ -2741,23 +2758,27 @@ function SimpleKavo.CreateLib(title, themeName)
 						BtnIcon.Name = "Icon"
 						BtnIcon.Rotation = 360
 						BtnIcon.Size = UDim2.fromScale(1, 1)
-						BtnIcon.ZIndex = 38
-						BtnIcon.Parent = BtnClick
+						BtnIcon.ZIndex = 39
+						BtnIcon.Parent = BtnFrame
 
 						local BtnIconGrad = Instance.new("UIGradient")
 						BtnIconGrad.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(200, 200, 200))
 						BtnIconGrad.Rotation = 90
 						BtnIconGrad.Parent = BtnIcon
 
-						BtnClick.MouseEnter:Connect(function()
-							Tween(BtnClick, { BackgroundColor3 = T.Button2 }, 0.2, 2)
+						ClickSensor.MouseEnter:Connect(function()
+							Tween(BtnFrame, { BackgroundColor3 = T.Button2 }, 0.2, 2)
 							Tween(BtnStroke, { Color = T.StrokeHover }, 0.2, 2)
 						end)
-						BtnClick.MouseLeave:Connect(function()
-							Tween(BtnClick, { BackgroundColor3 = T.Button1 }, 0.2, 2)
+						ClickSensor.MouseLeave:Connect(function()
+							Tween(BtnFrame, { BackgroundColor3 = T.Button1 }, 0.2, 2)
 							Tween(BtnStroke, { Color = T.Stroke }, 0.2, 2)
 						end)
-						BtnClick.MouseButton1Click:Connect(function()
+						ClickSensor.MouseButton1Click:Connect(function()
+							if BtnFrame.BackgroundColor3 ~= T.Button3 then
+								BtnFrame.BackgroundColor3 = T.Button3
+								Tween(BtnFrame, { BackgroundColor3 = T.Button1 }, 1, 2)
+							end
 							BtnIcon.ImageColor3 = T.Primary
 							Tween(BtnIcon, { ImageColor3 = Color3.fromRGB(255, 255, 255) }, 1, 2)
 							if callback then
@@ -2766,7 +2787,7 @@ function SimpleKavo.CreateLib(title, themeName)
 						end)
 
 						rows[opt.name] = rows[opt.name] or {}
-						rows[opt.name].btnClick = BtnClick
+						rows[opt.name].btnClick = ClickSensor
 						rows[opt.name].row = Row
 
 					elseif isColorPicker then
